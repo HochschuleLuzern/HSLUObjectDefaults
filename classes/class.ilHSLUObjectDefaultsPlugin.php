@@ -103,42 +103,38 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 		// FFMPEG Conversion of media files
 		if ($a_component == 'Services/MediaObjects' && $a_event == 'update' && isset($a_parameter) && count($a_parameter)>0 && isset($a_parameter['object'])){
 			
-			//check if new object is not in Marcos special course
-			if (!in_array(2834695, $obj_path=$tree->getPathId($a_parameter['object']->getRefId()))) {
+			$allMediaItems=$a_parameter['object']->getMediaItems();
+			$ffmpegQueue='ffmpegQueue.txt';
 			
-				$allMediaItems=$a_parameter['object']->getMediaItems();
-				$ffmpegQueue='ffmpegQueue.txt';
+			foreach($allMediaItems as $media_item){
+				$filename=$media_item->location;
 				
-				foreach($allMediaItems as $media_item){
-					$filename=$media_item->location;
+				//print substr($filename, strrpos($filename,'.')+1);exit;
+				
+				//if(substr($filename,-3)!='mp4'){
+				if(in_array(substr($filename, strrpos($filename,'.')+1), array('mp4','m4v','mov','flv','wmv','avi','mts','m2ts','mov','avi','wmv','aac','rm','mpg','mpeg','divx','flv','swf','ts','vob','mkv','ogv','mjpeg','m4v','3gpp'))){
 					
-					//print substr($filename, strrpos($filename,'.')+1);exit;
+					global $ilUser;
+					$folder=ilObjMediaObject::_getDirectory($a_parameter['object']->getId());
 					
-					//if(substr($filename,-3)!='mp4'){
-					if(in_array(substr($filename, strrpos($filename,'.')+1), array('mp4','m4v','mov','flv','wmv','avi','mts','m2ts','mov','avi','wmv','aac','rm','mpg','mpeg','divx','flv','swf','ts','vob','mkv','ogv','mjpeg','m4v','3gpp'))){
-						
-						global $ilUser;
-						$folder=ilObjMediaObject::_getDirectory($a_parameter['object']->getId());
-						
-						if(substr($filename,-3)!='mp4'){
-							$numofLines=ilHSLUObjectDefaultsPlugin::lineCount($ffmpegQueue);
-							ilUtil::sendSuccess('Ihre Datei wurde hochgeladen und wird nun in ein Streaming-kompatibles Format konvertiert. Sie werden via Mail informiert, sobald die Konvertierung abgeschlossen ist. Vor der aktuell hochgeladenen Datei hat es '.$numofLines.' andere in der Warteschlange. Besten Dank für Ihre Geduld.', true);
-						}
-						
-						file_put_contents($ffmpegQueue, $folder.'/'.$filename.'|'.$folder.'/'.substr($filename,0, strrpos($filename,'.')).'.mp4|'.$ilUser->getEmail()."\n", FILE_APPEND);
-						
-						//geht nicht wegen client cache
-						//@copy('Customizing/mob_vpreview.png', $folder.'/mob_vpreview.png');
-						//@chmod($folder.'/mob_vpreview.png',0664);
-						
-						//set new media format
-						$media_item->setFormat('video/mp4');
-						$media_item->setLocation(substr($filename,0, strrpos($filename,'.')).'.mp4');
-						$media_item->update();
-						
+					if(substr($filename,-3)!='mp4'){
+						$numofLines=ilHSLUObjectDefaultsPlugin::lineCount($ffmpegQueue);
+						ilUtil::sendSuccess('Ihre Datei wurde hochgeladen und wird nun in ein Streaming-kompatibles Format konvertiert. Sie werden via Mail informiert, sobald die Konvertierung abgeschlossen ist. Vor der aktuell hochgeladenen Datei hat es '.$numofLines.' andere in der Warteschlange. Besten Dank für Ihre Geduld.', true);
 					}
+					
+					file_put_contents($ffmpegQueue, $folder.'/'.$filename.'|'.$folder.'/'.substr($filename,0, strrpos($filename,'.')).'.mp4|'.$ilUser->getEmail()."\n", FILE_APPEND);
+					
+					//geht nicht wegen client cache
+					//@copy('Customizing/mob_vpreview.png', $folder.'/mob_vpreview.png');
+					
+					@chmod($folder,0775);
+					
+					//set new media format
+					$media_item->setFormat('video/mp4');
+					$media_item->setLocation(substr($filename,0, strrpos($filename,'.')).'.mp4');
+					$media_item->update();
+					
 				}
-			
 			}
 		}
 	}
