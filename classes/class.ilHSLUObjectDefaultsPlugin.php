@@ -71,8 +71,8 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 			if ($affected_crs == $a_parameter['obj_id'] && in_array(4781, $obj_path=$tree->getPathId($ref_id))) {
 				//Get the current access rights on the course
 				$user_role = $this->_getGlobalUserRoleId();
-
 				$local_ops = $rbacreview->getRoleOperationsOnObject($user_role, $ref_id);
+				$local_ops = array_map('strval', $local_ops);
 
 				//Get the access rights of the standard course user and remove rights that the standard user doesn't have
 				$non_member_template_id = $this->__getCrsNonMemberTemplateId();
@@ -103,38 +103,44 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 		// FFMPEG Conversion of media files
 		if ($a_component == 'Services/MediaObjects' && $a_event == 'update' && isset($a_parameter) && count($a_parameter)>0 && isset($a_parameter['object'])){
 			
-			$allMediaItems=$a_parameter['object']->getMediaItems();
-			$ffmpegQueue='ffmpegQueue.txt';
+			//check if new object is not in Marcos special course
+			//special for Marco Sommer, until end of HS15
+			if(!in_array($_GET['ref_id'],array(2899661,2899719,2903368,2903382,2903598,2903603,2903606,2903613,2903621,2903625,2903639,2903641,2903643,2903645,2903649,2903652,2903658))){
 			
-			foreach($allMediaItems as $media_item){
-				$filename=$media_item->location;
+				$allMediaItems=$a_parameter['object']->getMediaItems();
+				$ffmpegQueue='ffmpegQueue.txt';
 				
-				//print substr($filename, strrpos($filename,'.')+1);exit;
-				
-				//if(substr($filename,-3)!='mp4'){
-				if(in_array(substr($filename, strrpos($filename,'.')+1), array('mp4','m4v','mov','flv','wmv','avi','mts','m2ts','mov','avi','wmv','aac','rm','mpg','mpeg','divx','flv','swf','ts','vob','mkv','ogv','mjpeg','m4v','3gpp'))){
+				foreach($allMediaItems as $media_item){
+					$filename=$media_item->location;
 					
-					global $ilUser;
-					$folder=ilObjMediaObject::_getDirectory($a_parameter['object']->getId());
+					//print substr($filename, strrpos($filename,'.')+1);exit;
 					
-					if(substr($filename,-3)!='mp4'){
-						$numofLines=ilHSLUObjectDefaultsPlugin::lineCount($ffmpegQueue);
-						ilUtil::sendSuccess('Ihre Datei wurde hochgeladen und wird nun in ein Streaming-kompatibles Format konvertiert. Sie werden via Mail informiert, sobald die Konvertierung abgeschlossen ist. Vor der aktuell hochgeladenen Datei hat es '.$numofLines.' andere in der Warteschlange. Besten Dank für Ihre Geduld.', true);
+					//if(substr($filename,-3)!='mp4'){
+					if(in_array(substr($filename, strrpos($filename,'.')+1), array('mp4','m4v','mov','flv','wmv','avi','mts','m2ts','mov','avi','wmv','aac','rm','mpg','mpeg','divx','flv','swf','ts','vob','mkv','ogv','mjpeg','m4v','3gpp'))){
+						
+						global $ilUser;
+						$folder=ilObjMediaObject::_getDirectory($a_parameter['object']->getId());
+						
+						if(substr($filename,-3)!='mp4'){
+							$numofLines=ilHSLUObjectDefaultsPlugin::lineCount($ffmpegQueue);
+							ilUtil::sendSuccess('Ihre Datei wurde hochgeladen und wird nun in ein Streaming-kompatibles Format konvertiert. Sie werden via Mail informiert, sobald die Konvertierung abgeschlossen ist. Vor der aktuell hochgeladenen Datei hat es '.$numofLines.' andere in der Warteschlange. Besten Dank für Ihre Geduld.', true);
+						}
+						
+						file_put_contents($ffmpegQueue, $folder.'/'.$filename.'|'.$folder.'/'.substr($filename,0, strrpos($filename,'.')).'.mp4|'.$ilUser->getEmail()."\n", FILE_APPEND);
+						
+						//geht nicht wegen client cache
+						//@copy('Customizing/mob_vpreview.png', $folder.'/mob_vpreview.png');
+						
+						@chmod($folder,0775);
+						
+						//set new media format
+						$media_item->setFormat('video/mp4');
+						$media_item->setLocation(substr($filename,0, strrpos($filename,'.')).'.mp4');
+						$media_item->update();
+						
 					}
-					
-					file_put_contents($ffmpegQueue, $folder.'/'.$filename.'|'.$folder.'/'.substr($filename,0, strrpos($filename,'.')).'.mp4|'.$ilUser->getEmail()."\n", FILE_APPEND);
-					
-					//geht nicht wegen client cache
-					//@copy('Customizing/mob_vpreview.png', $folder.'/mob_vpreview.png');
-					
-					@chmod($folder,0775);
-					
-					//set new media format
-					$media_item->setFormat('video/mp4');
-					$media_item->setLocation(substr($filename,0, strrpos($filename,'.')).'.mp4');
-					$media_item->update();
-					
 				}
+			
 			}
 		}
 	}
