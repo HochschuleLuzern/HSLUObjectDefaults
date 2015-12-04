@@ -116,7 +116,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 					//print substr($filename, strrpos($filename,'.')+1);exit;
 					
 					//if(substr($filename,-3)!='mp4'){
-					if(in_array(substr($filename, strrpos($filename,'.')+1), array('mp4','m4v','mov','flv','wmv','avi','mts','m2ts','mov','avi','wmv','aac','rm','mpg','mpeg','divx','flv','swf','ts','vob','mkv','ogv','mjpeg','m4v','3gpp'))){
+					if(in_array(strtolower(substr($filename, strrpos($filename,'.')+1)), array('mp4','m4v','mov','flv','wmv','avi','mts','m2ts','mov','avi','wmv','aac','rm','mpg','mpeg','divx','flv','swf','ts','vob','mkv','ogv','mjpeg','m4v','3gpp'))){
 						
 						global $ilUser;
 						$folder=ilObjMediaObject::_getDirectory($a_parameter['object']->getId());
