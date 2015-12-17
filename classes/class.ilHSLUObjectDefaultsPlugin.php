@@ -116,7 +116,13 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 					//print substr($filename, strrpos($filename,'.')+1);exit;
 					
 					//if(substr($filename,-3)!='mp4'){
-					if(in_array(strtolower(substr($filename, strrpos($filename,'.')+1)), array('mp4','m4v','mov','flv','wmv','avi','mts','m2ts','mov','avi','wmv','aac','rm','mpg','mpeg','divx','flv','swf','ts','vob','mkv','ogv','mjpeg','m4v','3gpp'))){
+					
+					include_once ("./Modules/MediaCast/classes/class.ilMediaCastSettings.php");
+					$settings = ilMediaCastSettings::_getInstance();
+					$purposeSuffixes = $settings->getPurposeSuffixes();
+					
+					
+					if(in_array(substr($filename, strrpos($filename,'.')+1), $purposeSuffixes['Standard'])){
 						
 						global $ilUser;
 						$folder=ilObjMediaObject::_getDirectory($a_parameter['object']->getId());
