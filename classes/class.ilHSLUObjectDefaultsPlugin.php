@@ -122,7 +122,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 					$purposeSuffixes = $settings->getPurposeSuffixes();
 					
 					
-					if(in_array(substr($filename, strrpos($filename,'.')+1), $purposeSuffixes['Standard'])){
+					if(in_array(substr($filename, strrpos($filename,'.')+1), $purposeSuffixes['VideoPortable'])){
 						
 						global $ilUser;
 						$folder=ilObjMediaObject::_getDirectory($a_parameter['object']->getId());
