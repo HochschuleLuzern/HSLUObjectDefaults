@@ -102,63 +102,48 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 
 		// FFMPEG Conversion of media files
 		if ($a_component == 'Services/MediaObjects' && $a_event == 'update' && isset($a_parameter) && count($a_parameter)>0 && isset($a_parameter['object'])){
+			$allMediaItems=$a_parameter['object']->getMediaItems();
+			$ffmpegQueue='ffmpegQueue.txt';
 			
-			//check if new object is not in Marcos special course
-			//special for Marco Sommer, until end of HS15
-			if(!in_array($_GET['ref_id'],array(2899661,2899719,2903368,2903382,2903598,2903603,2903606,2903613,2903621,2903625,2903639,2903641,2903643,2903645,2903649,2903652,2903658))){
-			
-				$allMediaItems=$a_parameter['object']->getMediaItems();
-				$ffmpegQueue='ffmpegQueue.txt';
+			foreach($allMediaItems as $media_item){
+				$filename=$media_item->location;
 				
-				foreach($allMediaItems as $media_item){
-					$filename=$media_item->location;
+				//print substr($filename, strrpos($filename,'.')+1);exit;
+				
+				//if(substr($filename,-3)!='mp4'){
+				
+				include_once ("./Modules/MediaCast/classes/class.ilMediaCastSettings.php");
+				$settings = ilMediaCastSettings::_getInstance();
+				$purposeSuffixes = $settings->getPurposeSuffixes();
+				
+				
+				if(in_array(mb_strtolower(substr($filename, strrpos($filename,'.')+1)), $purposeSuffixes['VideoPortable'])){
 					
-					//print substr($filename, strrpos($filename,'.')+1);exit;
+					global $ilUser;
+					$folder=ilObjMediaObject::_getDirectory($a_parameter['object']->getId());
 					
-					//if(substr($filename,-3)!='mp4'){
-					
-					include_once ("./Modules/MediaCast/classes/class.ilMediaCastSettings.php");
-					$settings = ilMediaCastSettings::_getInstance();
-					$purposeSuffixes = $settings->getPurposeSuffixes();
-					
-					
-					if(in_array(substr($filename, strrpos($filename,'.')+1), $purposeSuffixes['VideoPortable'])){
-						
-						global $ilUser;
-						$folder=ilObjMediaObject::_getDirectory($a_parameter['object']->getId());
-						
-						if(substr($filename,-3)!='mp4'){
-							$numofLines=ilHSLUObjectDefaultsPlugin::lineCount($ffmpegQueue);
-							ilUtil::sendSuccess('Ihre Datei wurde hochgeladen und wird nun in ein Streaming-kompatibles Format konvertiert. Sie werden via Mail informiert, sobald die Konvertierung abgeschlossen ist. Vor der aktuell hochgeladenen Datei hat es '.$numofLines.' andere in der Warteschlange. Besten Dank für Ihre Geduld.', true);
-						}
-						
-						file_put_contents($ffmpegQueue, $folder.'/'.$filename.'|'.$folder.'/'.substr($filename,0, strrpos($filename,'.')).'.mp4|'.$ilUser->getEmail()."\n", FILE_APPEND);
-						
-						//geht nicht wegen client cache
-						//@copy('Customizing/mob_vpreview.png', $folder.'/mob_vpreview.png');
-						
-						@chmod($folder,0775);
-						
-						//set new media format
-						$media_item->setFormat('video/mp4');
-						$media_item->setLocation(substr($filename,0, strrpos($filename,'.')).'.mp4');
-						$media_item->update();
-						
+					if(substr($filename,-3)!='mp4'){
+						$numofLines=ilHSLUObjectDefaultsPlugin::lineCount($ffmpegQueue);
+						ilUtil::sendSuccess('Ihre Datei wurde hochgeladen und wird nun in ein Streaming-kompatibles Format konvertiert. Sie werden via Mail informiert, sobald die Konvertierung abgeschlossen ist. Vor der aktuell hochgeladenen Datei hat es '.$numofLines.' andere in der Warteschlange. Besten Dank für Ihre Geduld.', true);
 					}
+					
+					file_put_contents($ffmpegQueue, $folder.'/'.$filename.'|'.$folder.'/'.substr($filename,0, strrpos($filename,'.')).'.mp4|'.$ilUser->getEmail()."\n", FILE_APPEND);
+					
+					//geht nicht wegen client cache
+					//@copy('Customizing/mob_vpreview.png', $folder.'/mob_vpreview.png');
+					
+					@chmod($folder,0775);
+					
+					//set new media format
+					$media_item->setFormat('video/mp4');
+					$media_item->setLocation(substr($filename,0, strrpos($filename,'.')).'.mp4');
+					$media_item->update();
+					
 				}
-			
 			}
 		}
 	}
 
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	/**
 	 * @return string
