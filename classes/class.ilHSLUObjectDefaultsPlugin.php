@@ -108,14 +108,9 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 			foreach($allMediaItems as $media_item){
 				$filename=$media_item->location;
 				
-				//print substr($filename, strrpos($filename,'.')+1);exit;
-				
-				//if(substr($filename,-3)!='mp4'){
-				
 				include_once ("./Modules/MediaCast/classes/class.ilMediaCastSettings.php");
 				$settings = ilMediaCastSettings::_getInstance();
-				$purposeSuffixes = $settings->getPurposeSuffixes();
-				
+				$purposeSuffixes = $settings->getPurposeSuffixes();			
 				
 				if(in_array(mb_strtolower(substr($filename, strrpos($filename,'.')+1)), $purposeSuffixes['VideoPortable'])){
 					
@@ -139,6 +134,24 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 					$media_item->setLocation(substr($filename,0, strrpos($filename,'.')).'.mp4');
 					$media_item->update();
 					
+				} else if (in_array(mb_strtolower(substr($filename, strrpos($filename, '.')+1)), $purposeSuffixes['AudioPortable']) && substr($filename,-3)!='mp3'){
+					global $ilUser;
+					$folder=ilObjMediaObject::_getDirectory($a_parameter['object']->getId());
+					
+					$numofLines=ilHSLUObjectDefaultsPlugin::lineCount($ffmpegQueue);
+					ilUtil::sendSuccess('Ihre Datei wurde hochgeladen und wird nun in ein Streaming-kompatibles Format konvertiert. Sie werden via Mail informiert, sobald die Konvertierung abgeschlossen ist. Vor der aktuell hochgeladenen Datei hat es '.$numofLines.' andere in der Warteschlange. Besten Dank für Ihre Geduld.', true);
+						
+					file_put_contents($ffmpegQueue, $folder.'/'.$filename.'|'.$folder.'/'.substr($filename,0, strrpos($filename,'.')).'.mp3|'.$ilUser->getEmail()."\n", FILE_APPEND);
+						
+					//geht nicht wegen client cache
+					//@copy('Customizing/mob_vpreview.png', $folder.'/mob_vpreview.png');
+						
+					@chmod($folder,0775);
+						
+					//set new media format
+					$media_item->setFormat('audio/mpeg');
+					$media_item->setLocation(substr($filename,0, strrpos($filename,'.')).'.mp3');
+					$media_item->update();
 				}
 			}
 		}
