@@ -43,6 +43,35 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 	 */
 	public function handleEvent($a_component, $a_event, $a_parameter) {
 
+	    // Changes object title of file objects on upload in a postbox
+	    // Only needed for folders with didactic template "postbox"
+	    if($a_component == 'Services/Object' && $a_event == 'create')
+	    {
+	        $container_ref_id = $_GET['ref_id'];
+	        $container_type = ilObject::_lookupType($container_ref_id, true);
+	        
+	        // Check if it is a fileupload in a folder
+	        if($a_parameter[obj_type] == 'file' && $container_type == 'fold')
+	        {
+	            global $ilUser;
+	            
+	            include_once './Services/DidacticTemplate/classes/class.ilDidacticTemplateObjSettings.php';
+	            $postbox_tpl_id = ilDidacticTemplateObjSettings::lookupTemplateIdByName('Briefkasten');
+	            $tpl_id = ilDidacticTemplateObjSettings::lookupTemplateId($container_ref_id);
+	            
+	            // Check if folder uses the postbox-template and if the postbox-template exists
+	            if($tpl_id == $postbox_tpl_id && $postbox_tpl_id != 0)
+	            {
+	                // Change title of file object
+	                $obj_file = new ilObjFile($a_parameter['obj_id'], false);
+	                $filename = $obj_file->getTitle();
+	                $new_title = utf8_encode(substr(utf8_decode($ilUser->lastname),0,6).'.'.substr(utf8_decode($ilUser->firstname),0,1)).'.'.date('ymd').'.'.$filename;
+	                $obj_file->setTitle($new_title);
+	                $obj_file->update();
+	            }
+	        }
+	    }
+	    
 		// Adds access rights for standard participants to courses
 		// Only needed for Soziale Arbeit
 		// create course part of code
