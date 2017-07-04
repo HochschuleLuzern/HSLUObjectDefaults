@@ -132,7 +132,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 		// FFMPEG Conversion of media files
 		if ($a_component == 'Services/MediaObjects' && $a_event == 'update' && isset($a_parameter) && count($a_parameter)>0 && isset($a_parameter['object'])){
 			$allMediaItems=$a_parameter['object']->getMediaItems();
-			$ffmpegQueue='ffmpegQueue.txt';
+			$ffmpegQueue='data/ffmpegQueue.txt';
 			
 			foreach($allMediaItems as $media_item){
 				$filename=$media_item->location;
