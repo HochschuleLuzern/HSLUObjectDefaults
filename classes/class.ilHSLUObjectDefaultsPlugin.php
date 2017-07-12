@@ -43,6 +43,15 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 	 */
 	public function handleEvent($a_component, $a_event, $a_parameter) {
 
+	    /*
+	    // Show informations for users after login
+	    if($a_component == 'Services/Authentication' && $a_event == 'afterLogin')
+	    {
+	        $pl = new ilHSLUObjectDefaultsPlugin();
+	        ilUtil::sendInfo($pl->txt('update_info'), true);
+	    }
+	    */
+	    
 	    // Changes object title of file objects on upload in a postbox
 	    // Only needed for folders with didactic template "postbox"
 	    if($a_component == 'Services/Object' && $a_event == 'create')
