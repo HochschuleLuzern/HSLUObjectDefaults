@@ -54,7 +54,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 	    
 	    // Changes object title of file objects on upload in a postbox
 	    // Only needed for folders with didactic template "postbox"
-	    if($a_component == 'Services/Object' && $a_event == 'create')
+	    if($a_component == 'Services/Object' && $a_event == 'update')
 	    {
 	        $container_ref_id = $_GET['ref_id'];
 	        $container_type = ilObject::_lookupType($container_ref_id, true);
@@ -74,9 +74,12 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 	                // Change title of file object
 	                $obj_file = new ilObjFile($a_parameter['obj_id'], false);
 	                $filename = $obj_file->getTitle();
-	                $new_title = utf8_encode(substr(utf8_decode($ilUser->lastname),0,6).'.'.substr(utf8_decode($ilUser->firstname),0,1)).'.'.date('ymd').'.'.$filename;
-	                $obj_file->setTitle($new_title);
-	                $obj_file->update();
+	                
+	                if (strpos( $filename, ($prepos = utf8_encode(substr(utf8_decode($ilUser->lastname),0,6).'.'.substr(utf8_decode($ilUser->firstname),0,1)).'.'.date('ymd').'.')) !== 0 )
+	                {
+	                		$obj_file->setTitle($prepos.$filename);
+	                		$obj_file->update();
+	                }
 	            }
 	        }
 	    }
