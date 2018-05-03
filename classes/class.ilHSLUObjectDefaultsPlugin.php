@@ -157,11 +157,9 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 					
 					global $ilUser;
 					$folder=ilObjMediaObject::_getDirectory($a_parameter['object']->getId());
-					
-					if(substr($filename,-3)!='mp4'){
-						$numofLines=ilHSLUObjectDefaultsPlugin::lineCount($ffmpegQueue);
-						ilUtil::sendSuccess('Ihre Datei wurde hochgeladen und wird nun in ein Streaming-kompatibles Format konvertiert. Sie werden via Mail informiert, sobald die Konvertierung abgeschlossen ist. Vor der aktuell hochgeladenen Datei hat es '.$numofLines.' andere in der Warteschlange. Besten Dank für Ihre Geduld.', true);
-					}
+
+					$numofLines=ilHSLUObjectDefaultsPlugin::lineCount($ffmpegQueue);
+					ilUtil::sendInfo('Ihre Datei wurde hochgeladen und wird nun in ein Streaming-kompatibles Format konvertiert. Sie werden via Mail informiert, sobald die Konvertierung abgeschlossen ist. Vor der aktuell hochgeladenen Datei hat es '.$numofLines.' andere in der Warteschlange. Besten Dank für Ihre Geduld.', true);
 					
 					file_put_contents($ffmpegQueue, $folder.'/'.$filename.'|'.$folder.'/'.substr($filename,0, strrpos($filename,'.')).'.mp4|'.$ilUser->getEmail()."\n", FILE_APPEND);
 					
@@ -180,7 +178,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 					$folder=ilObjMediaObject::_getDirectory($a_parameter['object']->getId());
 					
 					$numofLines=ilHSLUObjectDefaultsPlugin::lineCount($ffmpegQueue);
-					ilUtil::sendSuccess('Ihre Datei wurde hochgeladen und wird nun in ein Streaming-kompatibles Format konvertiert. Sie werden via Mail informiert, sobald die Konvertierung abgeschlossen ist. Vor der aktuell hochgeladenen Datei hat es '.$numofLines.' andere in der Warteschlange. Besten Dank für Ihre Geduld.', true);
+					ilUtil::sendInfo('Ihre Datei wurde hochgeladen und wird nun in ein Streaming-kompatibles Format konvertiert. Sie werden via Mail informiert, sobald die Konvertierung abgeschlossen ist. Vor der aktuell hochgeladenen Datei hat es '.$numofLines.' andere in der Warteschlange. Besten Dank für Ihre Geduld.', true);
 						
 					file_put_contents($ffmpegQueue, $folder.'/'.$filename.'|'.$folder.'/'.substr($filename,0, strrpos($filename,'.')).'.mp3|'.$ilUser->getEmail()."\n", FILE_APPEND);
 						
