@@ -1,1 +1,6 @@
-update_info#:#
+configuration#:#Show a message after login
+message_label#:#Message
+message_info#:#This message will be shown to each user after every login
+active_label#:#Active
+active_info#:#Enables the message
+file_uploaded#:#Your file has been uploaded and will now be converted into a format apt for streaming. You will be informed by e-mail, once the convertion is done. There are %s files to be converted before yours. Thank you for your patience.

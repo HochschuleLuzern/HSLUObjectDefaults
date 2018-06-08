@@ -1,1 +1,6 @@
-update_info#:#
+configuration#:#Eine Nachricht nach dem Login schalten
+message_label#:#Nachricht
+message_info#:#Bitte geben Sie die Nachricht ein, welche jedem Nutzer nach dem Login angezeigt werden soll.
+active_label#:#Aktiv
+active_info#:#Bestimmt ob die Nachricht angezeigt wird.
+file_uploaded#:#Ihre Datei wurde hochgeladen und wird nun in ein Streaming-kompatibles Format konvertiert. Sie werden via Mail informiert, sobald die Konvertierung abgeschlossen ist. Vor der aktuell hochgeladenen Datei hat es %s andere in der Warteschlange. Besten Dank für Ihre Geduld.
