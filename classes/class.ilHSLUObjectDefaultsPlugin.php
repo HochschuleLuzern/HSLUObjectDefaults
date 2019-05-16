@@ -71,7 +71,6 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 			$crs = $a_parameter['object'];
 		
 			//activation unlimited, not offline
-			$crs->setActivationType(IL_CRS_ACTIVATION_UNLIMITED);
 			$crs->setOfflineStatus(false);
 
 			global $affected_crs;
@@ -232,7 +231,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 	
 		$q = "SELECT obj_id FROM object_data WHERE type='rolt' AND title='il_crs_non_member'";
 		$res = $db->query($q);
-		$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+		$row = $res->fetchRow(ilDBConstants::FETCHMODE_ASSOC);
 	
 		return $row["obj_id"];
 	}
