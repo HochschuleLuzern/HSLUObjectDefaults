@@ -51,7 +51,10 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 		global $DIC;
 
 	    // Show informations for users after login
-		if ($a_component == 'Services/Authentication' && $a_event == 'afterLogin' && ilHSLUObjectDefaultsConfigGUI::getValue('active'))
+		if ($a_component == 'Services/Authentication' && 
+			$a_event == 'afterLogin' && 
+			ilHSLUObjectDefaultsConfigGUI::getValue('active') &&
+			ilContext::getType() == ilContext::CONTEXT_WEB)
 	    {
 	        ilUtil::sendInfo(ilHSLUObjectDefaultsConfigGUI::getValue('message'), true);
 	    }
