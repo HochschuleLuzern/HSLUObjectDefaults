@@ -126,7 +126,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 		$ref_id=$crs->getRefId();
 		
 		//check if new Course is in "Soziale Arbeit -> Bachelor"
-		if ($affected_crs == $a_parameter['obj_id'] && in_array($start_node_id, $obj_path=$tree->getPathId($ref_id))) {
+		if ($ref_id !== null && $affected_crs == $a_parameter['obj_id'] && in_array($start_node_id, $obj_path=$tree->getPathId($ref_id))) {
 			//Get the current access rights on the course
 			$user_role = $this->getGlobalUserRoleId($rbacreview);
 			$local_ops = $rbacreview->getRoleOperationsOnObject($user_role, $ref_id);
