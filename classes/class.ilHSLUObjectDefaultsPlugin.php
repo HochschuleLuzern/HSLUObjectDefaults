@@ -83,7 +83,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 			// Adds access rights for standard participants to courses
 			// Only needed for Soziale Arbeit
 			// update course part of code
-			$this->openCourseAccess($a_parameter, $DIC->repositoryTree(), $DIC->rbac()->review(), $DIC->rbac()->admin(), $DIC->database(), 84/*4781*/);	
+			$this->openCourseAccess($a_parameter, $DIC->repositoryTree(), $DIC->rbac()->review(), $DIC->rbac()->admin(), $DIC->database(), 4781);	
 		}
 		else if ($a_component == 'Services/MediaObjects' && $a_event == 'update' && isset($a_parameter) && count($a_parameter)>0 && isset($a_parameter['object'])){
 			// FFMPEG Conversion of media files
