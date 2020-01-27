@@ -96,7 +96,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 		$container_type = ilObject::_lookupType($container_ref_id, true);
 		
 		// Check if it is a fileupload in a folder
-		if($a_parameter[obj_type] == 'file' && $container_type == 'fold')
+		if($a_parameter['obj_type'] == 'file' && $container_type == 'fold')
 		{
 			global $ilUser;
 
