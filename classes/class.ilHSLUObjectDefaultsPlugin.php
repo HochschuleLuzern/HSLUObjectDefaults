@@ -171,6 +171,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 		
 		foreach($allMediaItems as $media_item){
 			$filename=$media_item->location;
+			$media_item->resetParameters();
 
 			$settings = ilMediaCastSettings::_getInstance();
 			$purposeSuffixes = $settings->getPurposeSuffixes();
