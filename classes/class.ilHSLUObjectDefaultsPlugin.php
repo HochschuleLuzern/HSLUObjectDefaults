@@ -89,6 +89,20 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 			// FFMPEG Conversion of media files
 			$this->addToConversionQueue($a_parameter, $DIC->user());
 		}
+		else if ($a_component == 'Modules/Group' && $a_event == 'addParticipant' && $a_parameter['role_id'] == 5) {
+		    $path = $DIC->repositoryTree()->getNodePath($_GET['ref_id']);
+		    foreach ($path as $element) {
+		        if ($element['type'] == 'crs' && in_array($element['title'], ['W.ABPRC04.F20', 'W.BP_ABPRC02.F20', 'W.GSWSP06.F20'])) {
+		            $pax_object = new ilGroupParticipants($a_parameter['obj_id']);
+		            $pax_object->sendNotification(
+		                ilGroupMembershipMailNotification::TYPE_ADMISSION_MEMBER,
+		                $a_parameter['usr_id'],
+		                true
+		                );
+		            break;
+		        }
+		    }
+		}
 	}
 	
 	private function changeTitlePostbox($a_parameter, $user) {
