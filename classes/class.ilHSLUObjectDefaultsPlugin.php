@@ -68,16 +68,34 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 	    }
 	    else if ($a_component == 'Modules/Course' && ($a_event == 'create'))
 	    {
-			/*
+			/**
 			 * We set courses to online and active for an unlimited period of time by default
+			 * Since ILIAS 6, we also set the news per default to activated
+			 * @var $crs ilObjCourse
 			 */
 			$crs = $a_parameter['object'];
 		
 			//activation unlimited, not offline
 			$crs->setOfflineStatus(false);
 
+			// Activate news per default
+			$crs->setUseNews(true);
+			$crs->setNewsBlockActivated(true);
+
 			global $affected_crs;
 			$affected_crs = $a_parameter['obj_id'];
+		}
+		else if ($a_component == 'Modules/Group' && ($a_event == 'create'))
+		{
+			/**
+			 * Since ILIAS 6, we also set the news per default to activated
+			 * @var $grp ilObjGroup
+			 */
+			$grp = $a_parameter['object'];
+
+			// Activate news per default
+			$grp->setUseNews(true);
+			$grp->setNewsBlockActivated(true);
 		}
 		else if ($a_component == 'Modules/Course' && $a_event == 'update') {
 			// Adds access rights for standard participants to courses
