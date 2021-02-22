@@ -103,7 +103,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 			// update course part of code
 			$this->openCourseAccess($a_parameter, $DIC->repositoryTree(), $DIC->rbac()->review(), $DIC->rbac()->admin(), $DIC->database(), 4781);	
 		}
-		else if ($a_component == 'Modules/Course' && ($a_event == 'addParticipant' || $a_event == 'deleteParticipant')) {
+		else if ($a_component == 'Modules/Course' || $a_component == 'Modules/Group' && ($a_event == 'addParticipant' || $a_event == 'deleteParticipant')) {
 			// Is used when a user is added to a course
 			// the course is then added to their "Favorites"
 			// This is used with ILIAS6
@@ -120,7 +120,6 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 		if(count($list_of_ref_ids) >= 1) {
 			$ref_id = array_shift($list_of_ref_ids);
 			$fav_manager = new ilFavouritesManager();
-
 			if($a_event_name == 'addParticipant') {
 				$fav_manager->add($user_id, $ref_id);
 			} else if($a_event_name == 'deleteParticipant') {
