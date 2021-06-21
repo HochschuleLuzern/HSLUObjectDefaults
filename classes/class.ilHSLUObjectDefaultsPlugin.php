@@ -19,24 +19,6 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 		return self::PLUGIN_NAME;
 	}
 
-	/**
-	 * @var
-	 */
-	protected static $instance;
-
-
-	/**
-	 * @return ilHSLUObjectDefaultsPlugin
-	 */
-	public static function getInstance() {
-		if (!isset(self::$instance)) {
-			self::$instance = new self();
-		}
-
-		return self::$instance;
-	}
-
-
 	const PLUGIN_NAME = 'HSLUObjectDefaults';
 
 
@@ -50,23 +32,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 	public function handleEvent($a_component, $a_event, $a_parameter) {
 		global $DIC;
 
-	    // Show informations for users after login
-		if ($a_component == 'Services/Authentication' && 
-			$a_event == 'afterLogin' && 
-			ilHSLUObjectDefaultsConfigGUI::getValue('active') &&
-			ilContext::getType() == ilContext::CONTEXT_WEB)
-	    {
-	        ilUtil::sendInfo(ilHSLUObjectDefaultsConfigGUI::getValue('message'), true);
-	    }
-	    else if($a_component == 'Services/Object' && $a_event == 'update')
-	    {
-	    	/*
-	    	 * Changes object title of file objects on upload in a postbox
-	    	 * Only needed for folders with didactic template "postbox"
-	    	 */
-	    	$this->changeTitlePostbox($a_parameter, $DIC->user());
-	    }
-	    else if ($a_component == 'Modules/Course' && ($a_event == 'create'))
+	    if ($a_component == 'Modules/Course' && ($a_event == 'create'))
 	    {
 			/**
 			 * We set courses to online and active for an unlimited period of time by default
@@ -128,34 +94,6 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 		}
 	}
 	
-	private function changeTitlePostbox($a_parameter, $user) {
-		$container_ref_id = $_GET['ref_id'];
-		$container_type = ilObject::_lookupType($container_ref_id, true);
-		
-		// Check if it is a fileupload in a folder
-		if($a_parameter['obj_type'] == 'file' && $container_type == 'fold')
-		{
-			global $ilUser;
-
-			$postbox_tpl_id = ilDidacticTemplateObjSettings::lookupTemplateIdByName('Briefkasten');
-			$tpl_id = ilDidacticTemplateObjSettings::lookupTemplateId($container_ref_id);
-			
-			// Check if folder uses the postbox-template and if the postbox-template exists
-			if($tpl_id == $postbox_tpl_id && $postbox_tpl_id != 0)
-			{
-				// Change title of file object
-				$obj_file = new ilObjFile($a_parameter['obj_id'], false);
-				$filename = $obj_file->getTitle();
-				
-				if (strpos( $filename, ($prepos = utf8_encode(substr(utf8_decode($user->lastname),0,6).'.'.substr(utf8_decode($user->firstname),0,1)).'.'.date('ymd').'.')) !== 0 )
-				{
-					$obj_file->setTitle($prepos.$filename);
-					$obj_file->update();
-				}
-			}
-		}
-	}
-	
 	private function openCourseAccess($a_parameter, $tree, $rbacreview, $rbacadmin, $db, $start_node_id) {
 		global $affected_crs;
 		
@@ -210,10 +148,10 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 			$filename=$media_item->location;
 			$media_item->resetParameters();
 
-			$settings = ilMediaCastSettings::_getInstance();
-			$purposeSuffixes = $settings->getPurposeSuffixes();
+			$video_prefixes = explode(',', ilHSLUObjectDefaultsConfigGUI::getValue('video_types'));
+			$audio_prefixes = explode(',', ilHSLUObjectDefaultsConfigGUI::getValue('audio_types'));
 			
-			if(in_array(mb_strtolower(substr($filename, strrpos($filename,'.')+1)), $purposeSuffixes['VideoPortable'])){
+			if(in_array(mb_strtolower(substr($filename, strrpos($filename,'.')+1)), $video_prefixes)){
 				$folder=ilObjMediaObject::_getDirectory($a_parameter['object']->getId());
 				
 				$numofLines=ilHSLUObjectDefaultsPlugin::lineCount($ffmpegQueue);
@@ -231,7 +169,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 				$media_item->setLocation(substr($filename,0, strrpos($filename,'.')).'.mp4');
 				$media_item->update();
 				
-			} else if (in_array(mb_strtolower(substr($filename, strrpos($filename, '.')+1)), $purposeSuffixes['AudioPortable']) && substr($filename,-3)!='mp3'){
+			} else if (in_array(mb_strtolower(substr($filename, strrpos($filename, '.')+1)), $audio_prefixes) && substr($filename,-3)!='mp3'){
 				$folder=ilObjMediaObject::_getDirectory($a_parameter['object']->getId());
 				
 				$numofLines=ilHSLUObjectDefaultsPlugin::lineCount($ffmpegQueue);
