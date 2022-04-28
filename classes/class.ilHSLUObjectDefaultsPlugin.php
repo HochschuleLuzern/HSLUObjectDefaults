@@ -47,9 +47,6 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 			// Activate news per default
 			$crs->setUseNews(true);
 			$crs->setNewsBlockActivated(true);
-
-			global $affected_crs;
-			$affected_crs = $a_parameter['obj_id'];
 		}
 		else if ($a_component == 'Modules/Group' && ($a_event == 'create'))
 		{
@@ -62,12 +59,6 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 			// Activate news per default
 			$grp->setUseNews(true);
 			$grp->setNewsBlockActivated(true);
-		}
-		else if ($a_component == 'Modules/Course' && $a_event == 'update') {
-			// Adds access rights for standard participants to courses
-			// Only needed for Soziale Arbeit
-			// update course part of code
-			$this->openCourseAccess($a_parameter, $DIC->repositoryTree(), $DIC->rbac()->review(), $DIC->rbac()->admin(), $DIC->database(), 4781);	
 		}
 		else if ($a_component == 'Modules/Course' || $a_component == 'Modules/Group' && ($a_event == 'addParticipant' || $a_event == 'deleteParticipant')) {
 			// Is used when a user is added to a course
@@ -92,50 +83,6 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 				$fav_manager->remove($user_id, $ref_id);
 			}
 		}
-	}
-	
-	private function openCourseAccess($a_parameter, $tree, $rbacreview, $rbacadmin, $db, $start_node_id) {
-		global $affected_crs;
-		
-		$crs = $a_parameter['object'];
-		$ref_id=$crs->getRefId();
-		
-		//check if new Course is in "Soziale Arbeit -> Bachelor"
-		if ($ref_id !== null && $affected_crs == $a_parameter['obj_id'] && in_array($start_node_id, $obj_path=$tree->getPathId($ref_id))) {
-			//Get the current access rights on the course
-			$user_role = $this->getGlobalUserRoleId($rbacreview);
-			$local_ops = $rbacreview->getRoleOperationsOnObject($user_role, $ref_id);
-			$local_ops = array_map('strval', $local_ops);
-			
-			//Get the access rights of the standard course user and remove rights that the standard user doesn't have
-			$non_member_template_id = $this->getCrsNonMemberTemplateId($db);
-			$template_ops = $rbacreview->getOperationsOfRole($non_member_template_id, 'crs', ROLE_FOLDER_ID);
-			
-			$role_folders=array_intersect($obj_path, $rbacreview->getFoldersAssignedToRole($user_role));
-			end($role_folders);
-			$parent_role_folder = prev($role_folders);
-			if ($parent_role_folder == false) {
-				return;
-			}
-			
-			$parent_ops = $this->getTemplatePolicies($db, $user_role, $parent_role_folder, 'crs');
-			$template_ops = $this->intersectPolicies($template_ops, $parent_ops);
-			
-			//Get the local and the next higher policies
-			$local_policies = $this->getTemplatePolicies($db, $user_role, $ref_id);
-			
-			$parent_policies = $this->getTemplatePolicies($db, $user_role, $parent_role_folder);
-			$non_member_policies = $this->getTemplatePolicies($db, $non_member_template_id, '');
-			$non_member_policies = array_values($this->intersectPolicies($non_member_policies, $parent_policies));
-			
-			if ($local_ops == $template_ops && $local_policies == $non_member_policies) {
-				$rbacadmin->copyRoleTemplatePermissions($user_role, $parent_role_folder, $ref_id, $user_role);
-				$local_policies = $this->getTemplatePolicies($db, $user_role, $ref_id, 'crs');
-				$rbacadmin->grantPermission($user_role,$local_policies,$ref_id);
-			}
-		}
-		
-		unset($affected_crs);
 	}
 	
 	private function addToConversionQueue($a_parameter, $user) {
@@ -185,72 +132,6 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 				$media_item->update();
 			}
 		}
-	}
-
-	private function getGlobalUserRoleId($rbacreview) {
-		
-		$globalRoleIds = $rbacreview->getGlobalRoles();
-		$userRoleId = null;
-		foreach ($globalRoleIds as $roleId) {
-			$roleObj = ilObjectFactory::getInstanceByObjId($roleId);
-			if ($roleObj->getTitle()=='User' || $roleObj->getTitle()=='BenutzerIn') {
-				$userRoleId= $roleId;
-			}
-		}
-		return $userRoleId;
-	}
-	
-	/**
-	 * get course non-member template
-	 * @access	private
-	 * @param	return obj_id of roletemplate containing permissionsettings for
-	 *           non-member roles of a course.
-	 */
-	private function getCrsNonMemberTemplateId($db) {
-	
-		$q = "SELECT obj_id FROM object_data WHERE type='rolt' AND title='il_crs_non_member'";
-		$res = $db->query($q);
-		$row = $res->fetchRow(ilDBConstants::FETCHMODE_ASSOC);
-	
-		return $row["obj_id"];
-	}
-	
-	private function getTemplatePolicies ($db, $template_id, $folder_ref = '', $type = '') {
-		if ($folder_ref == '') {
-			$query = "SELECT o_r.ref_id FROM object_reference o_r ". 
-					"JOIN object_data o_d ON o_r.obj_id = o_d.obj_id ".
-					"WHERE o_d.type = 'rolf' ".
-					"AND (o_d.title = 'Rollen' OR o_d.title = 'Roles')";
-			$res = $db->query($query);
-			$folder_ref = $db->fetchObject($res)->ref_id;
-		}
-		
-		if ($type != '') {
-			$type = ' AND type='.$db->quote($type, 'text');
-		}
-		
-		$query = 'SELECT * FROM rbac_templates '.
-				'WHERE rol_id = '.$db->quote($template_id,'integer').' '.
-				'AND parent = '.$db->quote($folder_ref,'integer').$type;
-		$res = $db->query($query);
-		$operations = array();
-
-		while ($row = $db->fetchObject($res))
-		{
-			array_push($operations, $row->ops_id);
-		}
-		
-		return $operations;
-	}
-	
-	private function intersectPolicies ($current_ops, $needle_ops) {
-		foreach ($current_ops as $key=>$op) {
-			if (!in_array($op, $needle_ops)) {
-				unset($current_ops[$key]);
-			}
-		}
-		
-		return $current_ops;
 	}
 	
 	private static function lineCount($file) {
