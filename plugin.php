@@ -7,4 +7,3 @@ $responsible = 'Stephan Winiker';
 $responsible_mail = 'stephan.winiker@hslu.ch';
 $responsible = 'Raphael Heer';
 $responsible_mail = 'raphael.heer@hslu.ch';
-?>
