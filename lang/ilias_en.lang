@@ -1,7 +1,11 @@
-video_types_label#:#Video file type
-video_types_info#:#Files with this extensions will automatically be converted to a web-ready MP3.
-audio_types_label#:#Audio file type
+/**
+/ English Language File for HSLU-Objects-Default-Plugin
+**/
+<!-- language file start -->
 audio_types_info#:#Files with this extensions will automatically be converted to a web-ready MP3.
-types_to_transform_section_label#:#Video and Audio Convertion
-file_uploaded#:#Your file has been uploaded and will now be converted into a format apt for streaming. You will be informed by e-mail, once the convertion is done. There are %s files to be converted before yours. Thank you for your patience.
+audio_types_label#:#Audio file type
 confif_not_saved#:#Field could not be updated due to an unknown error.
+file_uploaded#:#Your file has been uploaded and will now be converted into a format apt for streaming. You will be informed by e-mail, once the convertion is done. There are %s files to be converted before yours. Thank you for your patience.
+types_to_transform_section_label#:#Video and Audio Convertion
+video_types_info#:#Files with this extensions will automatically be converted to a web-ready MP3.
+video_types_label#:#Video file type

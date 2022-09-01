@@ -1,6 +1,10 @@
-configuration#:#Montre un message après le login
-message_label#:#Message
-message_info#:#Ce message sera montré à tous les utilisateurs chaque fois qu'ils se connectent sur ILIAS
-active_label#:#Actif
+/**
+/ French Language File for HSLU-Objects-Default-Plugin
+**/
+<!-- language file start -->
 active_info#:#
+active_label#:#Actif
+configuration#:#Montre un message après le login
 file_uploaded#:#Votre fichier a était chargé et sera transformé dans un format compatible. Il y a encore %s fichier(s) à transformer avant le votre. Merci de patienter.
+message_info#:#Ce message sera montré à tous les utilisateurs chaque fois qu'ils se connectent sur ILIAS
+message_label#:#Message

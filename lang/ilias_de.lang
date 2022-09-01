@@ -1,7 +1,11 @@
-video_types_label#:#Videodateitypen
-video_types_info#:#Dateien mit diesen Endungen werden vom Konvertierungstool automatisch in webkompatible MP4-Dateien umgewandelt.
-audio_types_label#:#Audiodateitypen
+/**
+/ German Language File for HSLU-Objects-Default-Plugin
+**/
+<!-- language file start -->
 audio_types_info#:#Dateien mit diesen Endungen werden vom Konvertierungstool automatisch in webkompatible MP3-Dateien umgewandelt.
-types_to_transform_section_label#:#Video und Audio Konvertierung
-file_uploaded#:#Ihre Datei wurde hochgeladen und wird nun in ein Streaming-kompatibles Format konvertiert. Sie werden via Mail informiert, sobald die Konvertierung abgeschlossen ist. Vor der aktuell hochgeladenen Datei hat es %s andere in der Warteschlange. Besten Dank für Ihre Geduld.
+audio_types_label#:#Audiodateitypen
 config_not_saved#:#Feld konnte wegen eines unbekannten Fehlers nicht gespeichert werden.
+file_uploaded#:#Ihre Datei wurde hochgeladen und wird nun in ein Streaming-kompatibles Format konvertiert. Sie werden via Mail informiert, sobald die Konvertierung abgeschlossen ist. Vor der aktuell hochgeladenen Datei hat es %s andere in der Warteschlange. Besten Dank für Ihre Geduld.
+types_to_transform_section_label#:#Video und Audio Konvertierung
+video_types_info#:#Dateien mit diesen Endungen werden vom Konvertierungstool automatisch in webkompatible MP4-Dateien umgewandelt.
+video_types_label#:#Videodateitypen
