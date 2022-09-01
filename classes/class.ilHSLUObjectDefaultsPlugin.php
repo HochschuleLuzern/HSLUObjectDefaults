@@ -19,7 +19,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 		return self::PLUGIN_NAME;
 	}
 
-	const PLUGIN_NAME = 'HSLUObjectDefaults';
+	protected const PLUGIN_NAME = 'HSLUObjectDefaults';
 
 
 	/**
@@ -32,8 +32,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 	public function handleEvent($a_component, $a_event, $a_parameter) {
 		global $DIC;
 
-	    if ($a_component == 'Modules/Course' && ($a_event == 'create'))
-	    {
+	    if ($a_component == 'Modules/Course' && ($a_event == 'create')) {
 			/**
 			 * We set courses to online and active for an unlimited period of time by default
 			 * Since ILIAS 6, we also set the news per default to activated
@@ -47,9 +46,10 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 			// Activate news per default
 			$crs->setUseNews(true);
 			$crs->setNewsBlockActivated(true);
+			return;
 		}
-		else if ($a_component == 'Modules/Group' && ($a_event == 'create'))
-		{
+		
+		if ($a_component == 'Modules/Group' && ($a_event == 'create')) {
 			/**
 			 * Since ILIAS 6, we also set the news per default to activated
 			 * @var $grp ilObjGroup
@@ -59,33 +59,47 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin {
 			// Activate news per default
 			$grp->setUseNews(true);
 			$grp->setNewsBlockActivated(true);
+			return;
 		}
-		else if ($a_component == 'Modules/Course' || $a_component == 'Modules/Group' && ($a_event == 'addParticipant' || $a_event == 'deleteParticipant')) {
+		
+		if (($a_component == 'Modules/Course' || $a_component == 'Modules/Group') && ($a_event == 'addParticipant' || $a_event == 'deleteParticipant')) {
 			// Is used when a user is added to a course
 			// the course is then added to their "Favorites"
 			// This is used with ILIAS6
-			$this->participantAddedOrRemoved($a_event, $a_parameter['usr_id'], $a_parameter['obj_id']);
+			$this->participantAddedOrRemoved($a_event, (int) $a_parameter['usr_id'], (int) $a_parameter['obj_id']);
+			return;
 		}
-		else if ($a_component == 'Services/MediaObjects' && $a_event == 'update' && isset($a_parameter) && count($a_parameter)>0 && isset($a_parameter['object'])){
+		
+		if ($a_component == 'Services/MediaObjects' && $a_event == 'update' && isset($a_parameter) && count($a_parameter)>0 && isset($a_parameter['object'])){
 			// FFMPEG Conversion of media files
 			$this->addToConversionQueue($a_parameter, $DIC->user());
+			return;
 		}
 	}
 
-	private function participantAddedOrRemoved($a_event_name, $user_id, $obj_id) {
+	private function participantAddedOrRemoved(string $a_event_name, int $user_id, int $obj_id) : string
+	{
 		$list_of_ref_ids = ilObject::_getAllReferences($obj_id);
-		if(count($list_of_ref_ids) >= 1) {
-			$ref_id = array_shift($list_of_ref_ids);
-			$fav_manager = new ilFavouritesManager();
-			if($a_event_name == 'addParticipant') {
-				$fav_manager->add($user_id, $ref_id);
-			} else if($a_event_name == 'deleteParticipant') {
-				$fav_manager->remove($user_id, $ref_id);
-			}
+		if(count($list_of_ref_ids) < 1) {
+		    return 'no_objects_found';
 		}
+		
+		$ref_id = array_shift($list_of_ref_ids);
+		$fav_manager = new ilFavouritesManager();
+		if($a_event_name == 'addParticipant') {
+			$fav_manager->add($user_id, $ref_id);
+			return 'added';
+		}			
+		if($a_event_name == 'deleteParticipant') {
+			$fav_manager->remove($user_id, $ref_id);
+			return 'removed';
+		}
+		
+		return 'no_change';
 	}
 	
-	private function addToConversionQueue($a_parameter, $user) {
+	private function addToConversionQueue(array $a_parameter, ilObjUser $user) : void
+	{
 		$allMediaItems=$a_parameter['object']->getMediaItems();
 		$ffmpegQueue='data/ffmpegQueue.txt';
 		
