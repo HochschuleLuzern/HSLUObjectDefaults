@@ -4,7 +4,7 @@
  *
  * @author  Stephan Winiker <stephan.winiker@hslu.ch>
  * @version $Id$
- *
+ * @ilCtrl_isCalledBy    ilHSLUObjectDefaultsConfigGUI: ilObjComponentSettingsGUI
  */
 class ilHSLUObjectDefaultsConfigGUI extends ilPluginConfigGUI
 {
@@ -16,7 +16,7 @@ class ilHSLUObjectDefaultsConfigGUI extends ilPluginConfigGUI
     private $refinery;
     private $pl;
     
-    public function performCommand($cmd)
+    public function performCommand($cmd): void
     {
         global $DIC;
         $this->ui = $DIC->ui();
@@ -43,7 +43,7 @@ class ilHSLUObjectDefaultsConfigGUI extends ilPluginConfigGUI
         $this->ui->mainTemplate()->setContent($this->ui->renderer()->render($form));
     }
 
-    private function initFormFields()
+    private function initFormFields() : array
     {
         $factory = $this->ui->factory();
         

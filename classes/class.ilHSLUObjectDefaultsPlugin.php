@@ -13,10 +13,17 @@ include_once 'class.ilHSLUObjectDefaultsConfigGUI.php';
  */
 class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin
 {
+    const ID = 'hsluobjdef';
+    public function __construct()
+    {
+        global $DIC;
+        $this->db = $DIC->database();
+        parent::__construct($this->db, $DIC["component.repository"], self::ID);
+    }
     /**
      * @return string
      */
-    public function getPluginName()
+    public function getPluginName(): string
     {
         return self::PLUGIN_NAME;
     }
@@ -31,7 +38,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin
      * @param    event         event, e.g. "afterUpdate"
      * @param    array         array of event specific parameters
      */
-    public function handleEvent($a_component, $a_event, $a_parameter)
+    public function handleEvent($a_component, $a_event, $a_parameter): void
     {
         global $DIC;
 
