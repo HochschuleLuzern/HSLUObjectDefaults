@@ -129,16 +129,16 @@ class ilHSLUObjectDefaultsConfigGUI extends ilPluginConfigGUI
         }
 
         if (count($errors) > 0) {
-            ilUtil::sendFailure($this->lng->txt('msg_form_save_error'));
+            ilHSLUObjectDefaultsPlugin::sendFailure($this->lng->txt('msg_form_save_error'));
             return $errors;
         }
         
         if ($changed_values == 0) {
-            ilUtil::sendInfo($this->lng->txt('no_changes'), true);
+            ilHSLUObjectDefaultsPlugin::sendInfo($this->lng->txt('no_changes'), true);
             return $errors;
         }
-        
-        ilUtil::sendSuccess($this->lng->txt('saved_successfully'), true);
+
+        ilHSLUObjectDefaultsPlugin::sendSuccess($this->lng->txt('saved_successfully'), true);
         return $errors;
     }
     

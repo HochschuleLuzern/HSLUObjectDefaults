@@ -126,7 +126,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin
                 $folder = ilObjMediaObject::_getDirectory($a_parameter['object']->getId());
                 
                 $numofLines = ilHSLUObjectDefaultsPlugin::lineCount($ffmpegQueue);
-                ilUtil::sendInfo(sprintf($pl->txt('file_uploaded'), $numofLines), true);
+                ilHSLUObjectDefaultsPlugin::sendInfo(sprintf($pl->txt('file_uploaded'), $numofLines), true);
                 
                 file_put_contents($ffmpegQueue, $folder . '/' . $filename . '|' . $folder . '/' . substr($filename, 0, strrpos($filename, '.')) . '.mp4|' . $user->getEmail() . "\n", FILE_APPEND);
                 
@@ -143,7 +143,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin
                 $folder = ilObjMediaObject::_getDirectory($a_parameter['object']->getId());
                 
                 $numofLines = ilHSLUObjectDefaultsPlugin::lineCount($ffmpegQueue);
-                ilUtil::sendInfo(sprintf($pl->txt('file_uploaded'), $numofLines), true);
+                ilHSLUObjectDefaultsPlugin::sendInfo(sprintf($pl->txt('file_uploaded'), $numofLines), true);
                 
                 file_put_contents($ffmpegQueue, $folder . '/' . $filename . '|' . $folder . '/' . substr($filename, 0, strrpos($filename, '.')) . '.mp3|' . $user->getEmail() . "\n", FILE_APPEND);
                 
@@ -168,5 +168,76 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin
         }
         fclose($handle);
         return  $linecount;
+    }
+
+    /**
+     * Send Info Message to Screen.
+     *
+     * @param	string	message
+     * @param	boolean	if true message is kept in session
+     * @static
+     *
+     */
+    public static function sendInfo($a_info = "", $a_keep = false)
+    {
+        global $DIC;
+
+        if(isset($DIC["tpl"])) {
+            $tpl = $DIC["tpl"];
+            $tpl->setOnScreenMessage("info", $a_info, $a_keep);
+        }
+    }
+
+    /**
+     * Send Failure Message to Screen.
+     *
+     * @param	string	message
+     * @param	boolean	if true message is kept in session
+     * @static
+     *
+     */
+    public static function sendFailure($a_info = "", $a_keep = false)
+    {
+        global $DIC;
+
+        if (isset($DIC["tpl"])) {
+            $tpl = $DIC["tpl"];
+            $tpl->setOnScreenMessage("failure", $a_info, $a_keep);
+        }
+    }
+
+    /**
+     * Send Question to Screen.
+     *
+     * @param	string	message
+     * @param	boolean	if true message is kept in session
+     * @static	*/
+    public static function sendQuestion($a_info = "", $a_keep = false)
+    {
+        global $DIC;
+
+        if(isset($DIC["tpl"])) {
+            $tpl = $DIC["tpl"];
+            $tpl->setOnScreenMessage("question", $a_info, $a_keep);
+        }
+    }
+
+    /**
+     * Send Success Message to Screen.
+     *
+     * @param	string	message
+     * @param	boolean	if true message is kept in session
+     * @static
+     *
+     */
+    public static function sendSuccess($a_info = "", $a_keep = false)
+    {
+        global $DIC;
+
+        /** @var ilTemplate $tpl */
+        if(isset($DIC["tpl"])) {
+            $tpl = $DIC["tpl"];
+            $tpl->setOnScreenMessage("success", $a_info, $a_keep);
+        }
     }
 }
