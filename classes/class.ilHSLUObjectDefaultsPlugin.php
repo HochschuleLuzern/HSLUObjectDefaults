@@ -160,7 +160,7 @@ class ilHSLUObjectDefaultsPlugin extends ilEventHookPlugin
     private static function lineCount($file)
     {
         $linecount = 0;
-        $handle = fopen($file, "r");
+        $handle = fopen($file, "w+");
         while (!feof($handle)) {
             if (fgets($handle) !== false) {
                 $linecount++;
