@@ -9,11 +9,11 @@ This Event-Hook-Plugin sets Objects defaults according to what is needed at HSLU
 - Navigate to the root directory of your ILIAS installation on the command line
 - Execute following command to create the directory for the plugin slot "Repository Object":
 ```bash
-mkdir -p Customizing/global/plugins/Services/EventHandling/EventHook/
+mkdir -p public/Customizing/global/plugins/Services/EventHandling/EventHook/
 ```
 - Switch to the directory for the plugin slot
 ```bash
-cd Customizing/global/plugins/Services/EventHandling/EventHook/
+cd public/Customizing/global/plugins/Services/EventHandling/EventHook/
 ```
 - Clone the git repository from Github
 ```bash
